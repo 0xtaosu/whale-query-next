@@ -8,7 +8,7 @@ interface Props {
     data: AnalysisResult;
 }
 
-interface Node {
+interface Node extends d3.SimulationNodeDatum {
     id: string;
     label: string;
     type: 'holder' | 'related';
@@ -136,7 +136,7 @@ export default function Graph({ data }: Props) {
             .call(d3.drag<SVGGElement, Node>()
                 .on('start', dragstarted)
                 .on('drag', dragged)
-                .on('end', dragended));
+                .on('end', dragended) as any);
 
         // 添加节点圆圈
         node.append('circle')
@@ -178,10 +178,10 @@ export default function Graph({ data }: Props) {
         // 更新力导向图
         simulation.on('tick', () => {
             link
-                .attr('x1', d => (d.source as Node).x!)
-                .attr('y1', d => (d.source as Node).y!)
-                .attr('x2', d => (d.target as Node).x!)
-                .attr('y2', d => (d.target as Node).y!);
+                .attr('x1', d => (d.source as unknown as Node).x!)
+                .attr('y1', d => (d.source as unknown as Node).y!)
+                .attr('x2', d => (d.target as unknown as Node).x!)
+                .attr('y2', d => (d.target as unknown as Node).y!);
 
             node.attr('transform', d => `translate(${d.x},${d.y})`);
         });
