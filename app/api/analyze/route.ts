@@ -11,13 +11,16 @@ class AnalysisError extends Error {
 
 export async function POST(request: Request) {
     try {
-        const data = await request.json();
+        // const data = await request.json();
+        const { address } = await request.json();
+        if (!address) {
+            return NextResponse.json(
+                { error: 'Token address is required' },
+                { status: 400 }
+            );
 
-        if (!data.tokenAddress) {
-            throw new AnalysisError('Token address is required', 400);
         }
-
-        const result = await analyzeTokenHoldersRelatedAddresses(data.tokenAddress);
+        const result = await analyzeTokenHoldersRelatedAddresses(address);
         const serializedResult = {
             ...result,
             relatedAddresses: Object.fromEntries(result.relatedAddresses)
