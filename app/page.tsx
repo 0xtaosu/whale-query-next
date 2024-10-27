@@ -45,12 +45,6 @@ export default function Home() {
       {/* 头部说明 */}
       <div className="bg-white shadow sm:rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h2 className="text-lg font-medium text-gray-900">
-            Token Holder Analysis
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Enter a Solana token address to analyze its top holders and their transaction relationships.
-          </p>
           <div className="mt-4">
             <AddressInput onSubmit={handleAnalyze} />
           </div>
@@ -86,9 +80,11 @@ export default function Home() {
 
       {/* 分析结果 */}
       {data && (
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white shadow sm:rounded-lg">
             <div className="px-4 py-5 sm:p-6">
+
               <h3 className="text-lg font-medium text-gray-900">
                 Top Holders
               </h3>

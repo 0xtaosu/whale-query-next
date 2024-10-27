@@ -9,10 +9,9 @@
  * 4. 生成分析报告
  */
 
-import { fetchTokenHolders } from './dune';
+import { fetchTokenHolders } from './gmgn';
 import { getTransactionGraph, getAddressRelationGraph } from './solscan';
 import type { Transaction } from './solscan';
-import fs from 'fs';
 
 // 类型定义
 /**
@@ -299,49 +298,3 @@ export {
     analyzeTokenHoldersTransactions,
     analyzeTokenHoldersRelatedAddresses
 };
-
-/**
- * 测试入口
- * 用于直接运行文件时的测试
- */
-if (require.main === module) {
-    const testParams = {
-        tokenAddress: '66gsTs88mXJ5L4AtJnWqFW6H2L5YQDRy4W41y6zbpump',
-        topN: 10,
-        minAmount: 10
-    };
-
-    console.log('\n=== 开始测试分析 ===');
-    console.log('参数配置:');
-    console.log(`• Token Address: ${testParams.tokenAddress}`);
-    console.log(`• Top N Holders: ${testParams.topN}`);
-    console.log(`• Min Amount: ${testParams.minAmount} SOL`);
-
-    analyzeTokenHoldersRelatedAddresses(
-        testParams.tokenAddress,
-        testParams.topN,
-        testParams.minAmount
-    )
-        .then(result => {
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const filename = `analysis_result_${timestamp}.json`;
-
-            const serializedResult = {
-                ...result,
-                relatedAddresses: Object.fromEntries(result.relatedAddresses)
-            };
-
-            fs.writeFileSync(
-                filename,
-                JSON.stringify(serializedResult, null, 2)
-            );
-
-            console.log(`\n✓ 分析完成`);
-            console.log(`• 结果已保存至: ${filename}`);
-            console.log('=== 测试结束 ===\n');
-        })
-        .catch(error => {
-            console.error('\n❌ 分析失败:', error);
-            process.exit(1);
-        });
-}

@@ -6,28 +6,52 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@duneanalytics/client-sdk": "^0.2.4",
+    "@types/request": "^2.48.12",
+    "@types/request-promise": "^4.1.51",
     "axios": "^1.7.7",
+    "cloudscraper": "^4.6.0",
     "d3": "^7.9.0",
     "dotenv": "^16.4.5",
     "next": "15.0.1",
     "react": "19.0.0-rc-69d4b800-20241021",
-    "react-dom": "19.0.0-rc-69d4b800-20241021"
+    "react-dom": "19.0.0-rc-69d4b800-20241021",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "@types/d3": "^7.4.3",
+    "@types/jest": "^29.5.14",
     "@types/node": "^20.17.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "15.0.1",
+    "jest": "^29.7.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/__tests__"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/app/$1"
+    },
+    "setupFiles": [
+      "<rootDir>/__tests__/setup.ts"
+    ]
   }
 }

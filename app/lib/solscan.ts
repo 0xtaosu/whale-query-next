@@ -86,7 +86,7 @@ if (!API_KEY) {
 
 // 全局计数器和限流控制
 let apiCallCount = 0;
-const API_DELAY = 100; // ms between calls
+const API_DELAY = 10; // ms between calls
 
 /**
  * 添加延迟函数
@@ -113,6 +113,8 @@ async function callSolscanAPI(params: APIParams): Promise<any> {
 
 /**
  * 获取单个地址的最新交易
+ * @param {string} address - 要查询的地址
+ * @returns {Promise<Map<string, Transaction[]>>} 交易图谱
  */
 async function getLatestTransaction(address: string): Promise<Map<string, Transaction[]>> {
     const adjacencyList = new Map<string, Transaction[]>();
@@ -162,6 +164,8 @@ async function getLatestTransaction(address: string): Promise<Map<string, Transa
 
 /**
  * 合并多个邻接表
+ * @param {Map<string, Transaction[]>[]} maps - 多个邻接表
+ * @returns {Map<string, Transaction[]>} 合并后的邻接表
  */
 function mergeMaps(maps: Map<string, Transaction[]>[]): Map<string, Transaction[]> {
     const mergedMap = new Map<string, Transaction[]>();
@@ -180,6 +184,8 @@ function mergeMaps(maps: Map<string, Transaction[]>[]): Map<string, Transaction[
 
 /**
  * 获取多个地址的交易图
+ * @param {string[]} addresses - 要查询的地址列表
+ * @returns {Promise<Map<string, Transaction[]>>} 交易图谱
  */
 async function getTransactionGraph(addresses: string[]): Promise<Map<string, Transaction[]>> {
     try {
@@ -537,7 +543,6 @@ async function getAddressRelationGraph(
     }
 }
 
-// 导出函数和类型
 export {
     getTransactionGraph,
     getAddressRelationGraph
@@ -548,17 +553,3 @@ export type {
     SolscanResponse,
     APIParams
 };
-
-// 测试入口
-if (require.main === module) {
-    const testAddress = 'DNfuF1L62WWyW3pNakVkyGGFzVVhj4Yr52jSmdTyeBHm';
-    const minAmount = 50;
-
-    console.log('\n🧪 Starting test analysis');
-    console.log(`   Address: ${testAddress}`);
-    console.log(`   Min Amount: ${minAmount} SOL`);
-
-    getAddressRelationGraph(testAddress, minAmount)
-        .then(() => console.log('\n✅ Test completed successfully'))
-        .catch(error => console.error('\n❌ Test failed:', error));
-}

@@ -113,10 +113,23 @@ export default function Graph({ data }: Props) {
         const simulation = d3.forceSimulation<Node>(graphData.nodes)
             .force('link', d3.forceLink<Node, Link>(graphData.links)
                 .id(d => d.id)
-                .distance(50))
-            .force('charge', d3.forceManyBody().strength(-100))
+                .distance(50))  // 增加连接距离
+            .force('charge', d3.forceManyBody()
+                .strength(-150)  // 增加排斥力
+                .distanceMin(20) // 增加最小距离
+                .distanceMax(200)) // 增加最大距离
             .force('center', d3.forceCenter(width / 2, height / 2))
-            .force('collision', d3.forceCollide().radius(20));
+            .force('collision', d3.forceCollide()
+                .radius(20)     // 增加碰撞半径
+                .strength(0.8)) // 减小碰撞强度，让节点可以稍微重叠
+            .force('x', d3.forceX(width / 2).strength(0.05)) // 减小X方向的力
+            .force('y', d3.forceY(height / 2).strength(0.05)); // 减小Y方向的力
+
+        // 调整初始布局
+        simulation
+            .alpha(0.8)        // 减小初始能量
+            .alphaDecay(0.02)  // 保持默认衰减率
+            .velocityDecay(0.4); // 增加速度衰减，使运动更平滑
 
         // 创建连接线
         const link = g.append('g')
@@ -177,13 +190,19 @@ export default function Graph({ data }: Props) {
 
         // 更新力导向图
         simulation.on('tick', () => {
-            link
-                .attr('x1', d => (d.source as unknown as Node).x!)
-                .attr('y1', d => (d.source as unknown as Node).y!)
-                .attr('x2', d => (d.target as unknown as Node).x!)
-                .attr('y2', d => (d.target as unknown as Node).y!);
+            // 限制节点位置在视图范围内
+            node.attr('transform', d => {
+                d.x = Math.max(20, Math.min(width - 20, d.x!));
+                d.y = Math.max(20, Math.min(height - 20, d.y!));
+                return `translate(${d.x},${d.y})`;
+            });
 
-            node.attr('transform', d => `translate(${d.x},${d.y})`);
+            // 更新连接线
+            link
+                .attr('x1', d => Math.max(20, Math.min(width - 20, (d.source as unknown as Node).x!)))
+                .attr('y1', d => Math.max(20, Math.min(height - 20, (d.source as unknown as Node).y!)))
+                .attr('x2', d => Math.max(20, Math.min(width - 20, (d.target as unknown as Node).x!)))
+                .attr('y2', d => Math.max(20, Math.min(height - 20, (d.target as unknown as Node).y!)));
         });
 
         // 拖拽功能

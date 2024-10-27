@@ -9,7 +9,7 @@ interface Props {
 export default function HoldersTable({ data }: Props) {
     // 获取缩略地址
     const getShortAddress = (address: string) => {
-        return address ? `${address.substring(0, 4)}...` : '-';
+        return address ? `${address.substring(0, 4)}` : '-';
     };
 
     return (
@@ -44,7 +44,8 @@ export default function HoldersTable({ data }: Props) {
                                             className="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600"
                                             title={holder.holder_address}
                                         >
-                                            {getShortAddress(holder.holder_address)}
+                                            <a href={`https://solscan.io/address/${holder.holder_address}`} target="_blank" rel="noopener noreferrer"> {getShortAddress(holder.holder_address)}</a>
+
                                         </div>
                                     </div>
                                 </td>
@@ -58,7 +59,7 @@ export default function HoldersTable({ data }: Props) {
                                         className="text-sm text-gray-900 cursor-pointer hover:text-blue-600"
                                         title={lastTx?.from || ''}
                                     >
-                                        {lastTx ? getShortAddress(lastTx.from) : '-'}
+                                        <a href={`https://solscan.io/address/${lastTx?.from}`} target="_blank" rel="noopener noreferrer"> {lastTx ? getShortAddress(lastTx.from) : '-'}</a>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">

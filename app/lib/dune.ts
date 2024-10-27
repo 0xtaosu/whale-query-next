@@ -98,15 +98,3 @@ export const fetchTokenHolders = async (tokenAddress: string): Promise<HolderDat
         throw error;
     }
 };
-
-// 测试入口
-(async () => {
-    const tokenAddress = 'FqvtZ2UFR9we82Ni4LeacC1zyTiQ77usDo31DUokpump';
-    try {
-        const holders = await fetchTokenHolders(tokenAddress);
-        console.log('Holders:', holders);
-
-    } catch (error) {
-        console.error('Test failed:', error);
-    }
-})();
