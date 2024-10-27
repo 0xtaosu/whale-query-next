@@ -17,6 +17,7 @@
 
 import dotenv from 'dotenv';
 import axios from 'axios';
+import exchangeAddresses from '../config/exchange-addresses.json';
 
 dotenv.config();
 
@@ -370,6 +371,47 @@ async function getRelatedTransactions(
 }
 
 /**
+ * 检查地址是否为交易所地址
+ * @param {string} address - 要检查的地址
+ * @returns {boolean} 是否为交易所地址
+ */
+function isExchangeAddress(address: string): boolean {
+    // 获取所有交易所地址
+    const allExchangeAddresses = Object.values(exchangeAddresses.solana)
+        .flat();
+
+    return allExchangeAddresses.includes(address);
+}
+
+/**
+ * 过滤交易关系图，移除交易所相关的交易
+ * @param {Map<string, Transaction[]>} graph - 原始交易图
+ * @returns {Map<string, Transaction[]>} 过滤后的交易图
+ */
+function filterRelation(graph: Map<string, Transaction[]>): Map<string, Transaction[]> {
+    const filteredGraph = new Map<string, Transaction[]>();
+
+    for (const [from, transactions] of graph) {
+        // 如果发送方是交易所地址，跳过
+        if (isExchangeAddress(from)) {
+            continue;
+        }
+
+        // 过滤掉接收方是交易所的交易
+        const filteredTransactions = transactions.filter(tx =>
+            !isExchangeAddress(tx.to)
+        );
+
+        // 如果还有剩余交易，添加到新图中
+        if (filteredTransactions.length > 0) {
+            filteredGraph.set(from, filteredTransactions);
+        }
+    }
+
+    return filteredGraph;
+}
+
+/**
  * 获取地址的关联交易图
  * @param {string} address - 要分析的地址
  * @param {number} minAmount - 最小交易金额（SOL）
@@ -387,12 +429,17 @@ async function getAddressRelationGraph(
     try {
         const graph = await getRelatedTransactions(address, minAmount, 0, 2, new Set());
 
+        // 添加过滤步骤
+        console.log('\nFiltering exchange-related transactions...');
+        const filteredGraph = filterRelation(graph);
+        console.log(`Removed ${graph.size - filteredGraph.size} exchange-related addresses`);
+
         // 创建地址到深度的映射
         const addressDepth = new Map<string, number>();
         addressDepth.set(address, 0); // 起始地址深度为0
 
         // 计算每个地址的深度
-        for (const [from, edges] of graph) {
+        for (const [from, edges] of filteredGraph) {
             edges.forEach(edge => {
                 const toAddress = edge.to;
                 if (edge.type === 'in') {
@@ -413,7 +460,7 @@ async function getAddressRelationGraph(
         console.log('\nTransaction Graph:');
         for (let depth = 2; depth >= -2; depth--) {
             console.log(`\n=== Depth ${depth} ===`);
-            for (const [from, edges] of graph) {
+            for (const [from, edges] of filteredGraph) {
                 if (addressDepth.get(from) === depth) {
                     edges.forEach(edge => {
                         console.log(`\nFrom: ${from}`);
@@ -428,7 +475,7 @@ async function getAddressRelationGraph(
 
         // 打印 API 调用统计
         console.log(`\nTotal API calls made: ${apiCallCount}`);
-        for (const [from, edges] of graph) {
+        for (const [from, edges] of filteredGraph) {
             edges.forEach(edge => {
                 const toAddress = edge.to;
                 if (edge.type === 'in') {
@@ -449,7 +496,7 @@ async function getAddressRelationGraph(
         console.log('\nTransaction Graph:');
         for (let depth = 2; depth >= -2; depth--) {
             console.log(`\n=== Depth ${depth} ===`);
-            for (const [from, edges] of graph) {
+            for (const [from, edges] of filteredGraph) {
                 if (addressDepth.get(from) === depth) {
                     edges.forEach(edge => {
                         console.log(`\nFrom: ${from}`);
@@ -464,7 +511,7 @@ async function getAddressRelationGraph(
 
         // 打印 API 调用统计
         console.log(`\nTotal API calls made: ${apiCallCount}`);
-        for (const [from, edges] of graph) {
+        for (const [from, edges] of filteredGraph) {
             edges.forEach(edge => {
                 const toAddress = edge.to;
                 if (edge.type === 'in') {
@@ -485,7 +532,7 @@ async function getAddressRelationGraph(
         console.log('\nTransaction Graph:');
         for (let depth = 2; depth >= -2; depth--) {
             console.log(`\n=== Depth ${depth} ===`);
-            for (const [from, edges] of graph) {
+            for (const [from, edges] of filteredGraph) {
                 if (addressDepth.get(from) === depth) {
                     edges.forEach(edge => {
                         console.log(`\nFrom: ${from}`);
@@ -500,43 +547,7 @@ async function getAddressRelationGraph(
 
         // 打印 API 调用统计
         console.log(`\nTotal API calls made: ${apiCallCount}`);
-        for (const [from, edges] of graph) {
-            edges.forEach(edge => {
-                const toAddress = edge.to;
-                if (edge.type === 'in') {
-                    // 对于转入交易，from地址深度+1
-                    if (!addressDepth.has(from)) {
-                        addressDepth.set(from, (addressDepth.get(toAddress) || 0) + 1);
-                    }
-                } else {
-                    // 对于转出交易，to地址深度-1
-                    if (!addressDepth.has(toAddress)) {
-                        addressDepth.set(toAddress, (addressDepth.get(from) || 0) - 1);
-                    }
-                }
-            });
-        }
-
-        // 按深度输出结果
-        console.log('\nTransaction Graph:');
-        for (let depth = 2; depth >= -2; depth--) {
-            console.log(`\n=== Depth ${depth} ===`);
-            for (const [from, edges] of graph) {
-                if (addressDepth.get(from) === depth) {
-                    edges.forEach(edge => {
-                        console.log(`\nFrom: ${from}`);
-                        console.log(`  → To: ${edge.to}`);
-                        console.log(`    Amount: ${edge.amount} SOL`);
-                        console.log(`    Time: ${edge.formattedTime}`);
-                        console.log(`    Type: ${edge.type}`);
-                    });
-                }
-            }
-        }
-
-        // 打印 API 调用统计
-        console.log(`\nTotal API calls made: ${apiCallCount}`);
-        return graph;
+        return filteredGraph;
     } catch (error) {
         console.error('\n❌ Error in analysis:', error);
         return new Map();
