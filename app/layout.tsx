@@ -14,8 +14,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  'use client';
+
   return (
-    <html lang="en">
+    <html lang="en" className="trancy-zh-CN">
       <body className={inter.className}>
         <div className="min-h-screen bg-gray-50">
           <nav className="bg-white shadow-sm">

@@ -13,6 +13,7 @@ interface HolderData {
     holder_address: string;
     holder_sns: string | null;
     holder_pct_of_supply: string;
+    is_new: boolean;
 }
 
 interface GMGNHolder {
@@ -23,6 +24,7 @@ interface GMGNHolder {
     maker_token_tags: string[];
     amount_cur: number;
     wallet_tag_v2?: string;
+    is_new?: boolean;
 }
 
 interface GMGNResponse {
@@ -84,7 +86,6 @@ function filterHolders(holders: GMGNHolder[]): HolderData[] {
 
     return holders
         .filter(holder => {
-
             if (holder.name && FILTERED_NAMES.some(name =>
                 holder.name?.toLowerCase().includes(name.toLowerCase())
             )) {
@@ -95,7 +96,8 @@ function filterHolders(holders: GMGNHolder[]): HolderData[] {
         .map(holder => ({
             holder_address: holder.address,
             holder_sns: holder.name || null,
-            holder_pct_of_supply: holder.amount_percentage.toString()
+            holder_pct_of_supply: holder.amount_percentage.toString(),
+            is_new: holder.is_new || false
         }));
 }
 

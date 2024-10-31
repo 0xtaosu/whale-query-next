@@ -44,6 +44,9 @@ export default function HoldersTable({ data }: Props) {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Holdings (%)
                         </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Mark
+                        </th>
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -85,6 +88,11 @@ export default function HoldersTable({ data }: Props) {
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="text-sm text-gray-900">
                                         {(parseFloat(holder.holder_pct_of_supply) * 100).toFixed(2)}%
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-sm text-gray-900">
+                                        {holder.is_new ? 'New' : '-'}
                                     </div>
                                 </td>
                             </tr>

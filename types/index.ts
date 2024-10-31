@@ -16,6 +16,7 @@ export interface Holder {
     holder_address: string;
     holder_sns: string | null;
     holder_pct_of_supply: string;
+    is_new: boolean;
 }
 
 export interface AnalysisResult {
