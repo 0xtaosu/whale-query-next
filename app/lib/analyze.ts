@@ -175,8 +175,8 @@ async function analyzeTokenHoldersTransactions(
  */
 async function analyzeTokenHoldersRelatedAddresses(
     tokenAddress: string,
-    topN: number = 10,
-    minAmount: number = 10
+    topN: number = 20,
+    minAmount: number = 5
 ): Promise<AnalysisResult> {
     try {
         // 1. 获取持有者列表

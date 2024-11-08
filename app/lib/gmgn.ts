@@ -77,11 +77,12 @@ function filterHolders(holders: GMGNHolder[]): HolderData[] {
     // 定义需要过滤的名称列表
     const FILTERED_NAMES = [
         'Raydium Authority V4',
+        'Raydium Pool',
+        'Raydium LP',
         'MEXC',
         'Gate.io',
         'HTX',
-        'Raydium Pool',
-        'Raydium LP'
+        'Bitget'
     ];
 
     return holders
